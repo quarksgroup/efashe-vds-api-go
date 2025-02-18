@@ -7,6 +7,16 @@ import (
 
 const (
 	APIV2BaseURL = "https://sb-api.efashe.com/rw/v2/"
+
+	// Known balances id
+	CommissionBalanceId = "commission"
+	MainBalanceId       = "main"
+	FeesbalanceId       = "fees"
+
+	// Known verticals id
+	AirtimeVerticalId     = "airtime"
+	PayTvVerticalId       = "paytv"
+	ElectricityVerticalId = "electricity"
 )
 
 var (
