@@ -328,8 +328,8 @@ type ElectricityToken struct {
 	// The Number of Units of the token
 	Units          float64 `json:"units"`
 	Token          string  `json:"token"`
-	Toke2          string  `json:"token2"`
-	Toke3          string  `json:"token3"`
+	Token2         string  `json:"token2"`
+	Token3         string  `json:"token3"`
 	MeterNo        string  `json:"meterno"`
 	ReceiptNo      string  `json:"receipt_no"`
 	Tstamp         string  `json:"tstamp"`
