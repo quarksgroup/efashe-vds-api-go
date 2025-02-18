@@ -201,6 +201,7 @@ type VendValidateResp struct {
 		// may be among active┃inactive┃suspended...
 		PdtStatusId string `json:"pdtStatusId"`
 		SharedVendInfo
+		CustomerAccountName string `json:"customerAccountName"`
 		// e.g: EUCL
 		ServiceProviderName string `json:"svcProviderName"`
 		// 	Allowed: fixed┃flexible
