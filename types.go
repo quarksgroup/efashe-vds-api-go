@@ -17,6 +17,13 @@ const (
 	AirtimeVerticalId     = "airtime"
 	PayTvVerticalId       = "paytv"
 	ElectricityVerticalId = "electricity"
+
+	// Transaction state
+	TransactionFailedState    = "failed"
+	TransactionSuccessedState = "successful"
+	TransactionTimeoutState   = "timedout"
+	TransactionPendingState   = "pending"
+	TransactionInitiatedtate  = "initiated"
 )
 
 var (
