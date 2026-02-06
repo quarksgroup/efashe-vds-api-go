@@ -228,6 +228,16 @@ type VendValidateResp struct {
 		// main.AvailBal + refund.AvailBal + commission.AvailBal - where business policy allows for automatic depletion of the commission wallet.
 		AvailTransactionBalance float64                  `json:"availTrxBalance"`
 		DeliveryMethods         []VerticalDeliveryMethod `json:"deliveryMethods"`
+		// Optional fixed amounts for selection when vendUnitId is flexible. Null when not applicable.
+		SelectAmount []float64 `json:"selectAmount,omitempty"`
+		// Stock management flag; structure varies by product. Null when not applicable.
+		LocalStockMgt any `json:"localStockMgt,omitempty"`
+		// Stocked products list; structure varies by product. Null when not applicable.
+		StockedPdts any `json:"stockedPdts,omitempty"`
+		// Stock quantity or info; structure varies by product. Null when not applicable.
+		Stock any `json:"stock,omitempty"`
+		// Vertical-specific metadata (e.g. tax: tin, validate_id, pay_ref, tax_center, dec_date, is_full_pay, tax_type).
+		ExtraInfo map[string]any `json:"extraInfo,omitempty"`
 	} `json:"data"`
 }
 
