@@ -60,6 +60,8 @@ type Client interface {
 	VendExecute(ctx context.Context, body VendExecuteBody, opts ...Option) (*VendExecuteResp, error)
 	// Reports the status of a vend transaction.
 	VendTransactionStatus(ctx context.Context, transactionId string, opts ...Option) (*VendTransactionStatusResp, error)
+	// Initiate a new transaction using a previous transaction from history.
+	RepeatTransaction(ctx context.Context, transactionId string, opts ...Option) (*VendExecuteResp, error)
 	// Get latest tokens of the meter number.
 	ElectricityTokens(ctx context.Context, meterNo string, tokensCount int, opts ...Option) (*ElectricityTokenResp, error)
 }
@@ -141,11 +143,11 @@ type VendTransactionStatusResp struct {
 
 type AuthResp struct {
 	Data struct {
-		AgencyPOP struct {
-			POPId        string `json:"popId"`
-			POPName      string `json:"popName"`
-			POPShortCode string `json:"popShortCode"`
-			POPStatusId  string `json:"popStatusId"`
+		AgencyBranch struct {
+			BranchId        string `json:"branchId"`
+			BranchName      string `json:"branchName"`
+			BranchShortCode string `json:"branchShortCode"`
+			BranchStatusId  string `json:"branchStatusId"`
 			// Allowed: fixed┃roaming┃virtual
 			PresenceId string `json:"presenceId"`
 			// Allowed: main┃branch
@@ -153,7 +155,7 @@ type AuthResp struct {
 			Address1Id    string `json:"address1Id"`
 			Address2Id    string `json:"address2Id"`
 			StreetAddress string `json:"streetAddress"`
-		} `json:"agencyPOP"`
+		} `json:"agencyBranch"`
 		AgencyAccount struct {
 			AgencyId        string `json:"agencyId"`
 			AgencyName      string `json:"agencyName"`
@@ -170,7 +172,7 @@ type AuthResp struct {
 		// The date and time (expressed in UTC) when the access token will expire
 		AccessTokenExpiresAt string `json:"accessTokenExpiresAt"`
 		// The date and time (expressed in UTC) when the refresh token will expire
-		RefreshTokenExpiresAt string `json:"refreshTokenExpiresAt "`
+		RefreshTokenExpiresAt string `json:"refreshTokenExpiresAt"`
 	} `json:"data"`
 }
 
@@ -229,7 +231,10 @@ type VendValidateResp struct {
 		AvailTransactionBalance float64                  `json:"availTrxBalance"`
 		DeliveryMethods         []VerticalDeliveryMethod `json:"deliveryMethods"`
 		// Optional fixed amounts for selection when vendUnitId is flexible. Null when not applicable.
-		SelectAmount []float64 `json:"selectAmount,omitempty"`
+		SelectAmount []struct {
+			Amount   float64 `json:"amount"`
+			Currency string  `json:"currency"`
+		} `json:"selectAmount,omitempty"`
 		// Stock management flag; structure varies by product. Null when not applicable.
 		LocalStockMgt any `json:"localStockMgt,omitempty"`
 		// Stocked products list; structure varies by product. Null when not applicable.
@@ -247,8 +252,8 @@ type VendExecuteResp struct {
 		PollEndpoint string `json:"pollEndpoint"`
 		// An estimate of when processing will complete in seconds.
 		// This is designed to prevent polling clients from overwhelming the back-end with retries.
-		RetryAfterSecs float64
-	}
+		RetryAfterSecs float64 `json:"retryAfterSecs"`
+	} `json:"data"`
 }
 
 type ElectricityTokenResp struct {

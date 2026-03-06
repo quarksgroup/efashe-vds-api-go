@@ -144,7 +144,7 @@ func (c *client) ValidateSession(ctx context.Context, opts ...Option) (bool, err
 	}
 
 	var res struct {
-		Msg string `json:"string"`
+		Msg string `json:"msg"`
 	}
 	statusCode, status, err := httpDo(cl, req, &res, true)
 	if err != nil {
@@ -375,6 +375,35 @@ func (c *client) VendTransactionStatus(ctx context.Context, transactionId string
 	switch statusCode {
 	case http.StatusOK, http.StatusAccepted:
 		v := res.VendTransactionStatusResp
+		return &v, nil
+	case http.StatusNotFound:
+		c.debug(fmt.Sprintf("[efashevdsapigo] %s", path), "status", status, "message", res.Msg)
+		return nil, ErrTransactionNotFound
+	default:
+		c.debug(fmt.Sprintf("[efashevdsapigo] %s", path), "status", status, "message", res.Msg)
+		return nil, errors.New(res.Msg)
+	}
+}
+
+func (c *client) RepeatTransaction(ctx context.Context, transactionId string, opts ...Option) (*VendExecuteResp, error) {
+
+	path := fmt.Sprintf("/trx/history/%s/repeat", transactionId)
+	cl, req, err := c.setRequestParams(ctx, nil, http.MethodPost, path, true, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	var res struct {
+		VendExecuteResp
+		Msg string `json:"msg"`
+	}
+	statusCode, status, err := httpDo(cl, req, &res, true)
+	if err != nil {
+		return nil, err
+	}
+	switch statusCode {
+	case http.StatusOK, http.StatusAccepted:
+		v := res.VendExecuteResp
 		return &v, nil
 	case http.StatusNotFound:
 		c.debug(fmt.Sprintf("[efashevdsapigo] %s", path), "status", status, "message", res.Msg)
