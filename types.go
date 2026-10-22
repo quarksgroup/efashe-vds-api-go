@@ -156,6 +156,19 @@ type AuthResp struct {
 			Address2Id    string `json:"address2Id"`
 			StreetAddress string `json:"streetAddress"`
 		} `json:"agencyBranch"`
+		AgencyPOP struct {
+			POPId        string `json:"popId"`
+			POPName      string `json:"popName"`
+			POPShortCode string `json:"popShortCode"`
+			POPStatusId  string `json:"popStatusId"`
+			// Allowed: fixed┃roaming┃virtual
+			PresenceId string `json:"presenceId"`
+			// Allowed: main┃branch
+			ClassId       string `json:"classId"`
+			Address1Id    string `json:"address1Id"`
+			Address2Id    string `json:"address2Id"`
+			StreetAddress string `json:"streetAddress"`
+		} `json:"agencyPOP"`
 		AgencyAccount struct {
 			AgencyId        string `json:"agencyId"`
 			AgencyName      string `json:"agencyName"`

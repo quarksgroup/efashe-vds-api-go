@@ -164,7 +164,18 @@ func (c *client) ValidateSession(ctx context.Context, opts ...Option) (bool, err
 
 func (c *client) Auth(ctx context.Context, opts ...Option) (*AuthResp, error) {
 
-	body := strings.NewReader(fmt.Sprintf(`{"api_key": %q, "api_secret": %q}`, c.apiKey, c.apiSecret))
+	bodyJSON, err := json.Marshal(struct {
+		APIKey    string `json:"api_key"`
+		APISecret string `json:"api_secret"`
+	}{
+		APIKey:    c.apiKey,
+		APISecret: c.apiSecret,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	body := bytes.NewReader(bodyJSON)
 	cl, req, err := c.setRequestParams(ctx, body, http.MethodPost, "/auth", false, opts...)
 	if err != nil {
 		return nil, err
@@ -174,12 +185,17 @@ func (c *client) Auth(ctx context.Context, opts ...Option) (*AuthResp, error) {
 		AuthResp
 		Msg string `json:"msg"`
 	}
+
 	statusCode, status, err := httpDo(cl, req, &res, true)
 	if err != nil {
 		return nil, err
 	}
+
 	switch statusCode {
 	case http.StatusOK:
+		if res.Data.AccessToken == "" || res.Data.RefreshToken == "" {
+			return nil, errors.New("auth response did not contain accessToken or refreshToken")
+		}
 		v := res.AuthResp
 		return &v, nil
 	case http.StatusBadRequest:
@@ -217,6 +233,9 @@ func (c *client) RefreshToken(ctx context.Context, opts ...Option) (*RefreshToke
 	}
 	switch statusCode {
 	case http.StatusOK:
+		if res.Data.AccessToken == "" || res.Data.RefreshToken == "" {
+			return nil, errors.New("refresh token response did not contain accessToken or refreshToken")
+		}
 		v := res.RefreshTokenResp
 		return &v, nil
 	default:
@@ -484,6 +503,11 @@ func (c *client) setRequestParams(ctx context.Context, body io.Reader, method, p
 	if shouldAuth {
 		addBearerToken(req.Header, c.accessToken)
 	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
 	setHeaders(req.Header, customHd)
 	return cl, req, nil
 }
